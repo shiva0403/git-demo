@@ -1,0 +1,43 @@
+host="ip-10-247-65-146"
+
+host="ip-10-247-65-146" "accessing " | stats count by field3
+
+host="ip-10-247-65-146" "accessing " | table field3 , _time
+
+index=* source!=lsof source!=package access (denied OR failed OR error OR warn*)  index=mdp
+
+host="ip-10-247-65-146" "Hibernate: " | stats count by field3 - Find the queries executed by hibernate
+sourcetype="jboss:server:log" component="gov.hhs.cms.mdp.mdpCommon.ValidationResult" tag=error
+
+sourcetype="jboss:server:log" component="gov.hhs.cms.mdp.mdpCommon.ValidationResult" | stats count by tag
+
+sourcetype="jboss:server:log" component="gov.hhs.cms.mdp.mdpCommon.ValidationResult" | table field4,myrule, _time
+
+sourcetype="jboss:server:log" component="gov.hhs.cms.mdp.mdpCommon.ValidationResult" tag=error |  eval newField= field4.": ".myrule| table newField, _time
+
+sourcetype="jboss:server:log" component="gov.hhs.cms.mdp.mdpCommon.ValidationResult" tag=alert
+
+host="ip-10-247-65-146" "Hibernate: " | eval query_field = replace(query_field, "Hibernate: ", "") | table query_field
+
+host="ip-10-247-65-146" "Hibernate: " | eval query_field = replace(query_field, "Hibernate: ", "") | stats count by query_field | where count > 100 | sort -count
+
+host="ip-10-247-65-146" "Hibernate: "  | stats count by date_wday | eval sort_field=case(date_wday=="monday",1, date_wday=="tuesday",2, date_wday=="wednesday",3, date_wday=="thursday",4, date_wday=="friday",5, date_wday=="weekend",6) | sort sort_field | fields - sort_field
+
+sourcetype="jboss:server:log" "Starting deployment of \"mdpDataApp.war\"" OR "Deployed \"mdpDataApp.war\""| chart count by host
+
+sourcetype="jboss:server:log" "Starting deployment of \"mdp*App.war\""| eval ip= replace( substr(host, 4, len(host)),"-",".")| lookup mdp_server_type host outputnew mdp_server_type as server_type  | stats count by server_type, ip
+
+Alias="aws-hhs-cms-cmcs-mdp"
+
+sourcetype="apache:activemq"
+https://docs.splunk.com/Documentation/Splunk/7.2.5/SearchReference/Sort
+
+
+
+
+
+
+sourcetype="jboss:server:log" "MdpDataProvider.postHttpRequest: response Body:" "dataAppCommitIdAbbrev" | dedup query_field | eval query_field = replace (query_field, "\\\\","") | eval query_field = replace(query_field, "\"{\"", "{\"") | eval query_field = replace(query_field, "\"}\"", "\"}")| eval query_field = substr(query_field, 49, len(query_field)) | table query_field
+
+
+sourcetype="jboss:server:log" "MdpDataProvider.postHttpRequest: response Body:" "dataAppCommitIdAbbrev" | dedup query_field | eval query_field = replace (query_field, "\\\\","") | eval query_field = replace(query_field, "\"{\"", "{\"") | eval query_field = replace(query_field, "\"}\"", "\"}")| eval query_field = substr(query_field, 49, len(query_field)) |spath input=query_field output=buildno path=data.dataAppCommitIdAbbrev | table buildno, _time
