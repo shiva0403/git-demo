@@ -66,3 +66,12 @@ FROM (
     ORDER BY total_size DESC
 ) AS pretty_sizes
 where table_name like '%information_schema%';
+
+pg_dump -U postgres -Cs database > dump_file
+SHOW search_path;
+And to put the new schema in the path, you could use:
+SET search_path TO myschema;
+Or if you want multiple schemas:
+SET search_path TO myschema, public;
+
+From <https://stackoverflow.com/questions/34098326/how-to-select-a-schema-in-postgres-when-using-psql> 
